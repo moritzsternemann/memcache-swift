@@ -4,6 +4,13 @@ import PackageDescription
 
 let package = Package(
     name: "memcache-swift",
+    platforms: [ // for Foundation.Scanner
+        .iOS(.v13),
+        .macOS(.v10_15),
+        .macCatalyst(.v13),
+        .tvOS(.v13),
+        .watchOS(.v6)
+    ],
     products: [
         .library(name: "Memcache", targets: ["Memcache"]),
         .executable(name: "memcache-swift-example", targets: ["memcache-swift-example"])

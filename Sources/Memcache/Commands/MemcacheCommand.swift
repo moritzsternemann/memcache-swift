@@ -32,3 +32,39 @@ public struct MemcacheCommand<Result> {
         self.transform = transform
     }
 }
+
+extension MemcacheCommand where Result == MemcacheResponse {
+    public init(keyword: String, arguments: [String], data: ByteBuffer? = nil) {
+        self.init(keyword: keyword, arguments: arguments, data: data) { $0 }
+    }
+}
+
+extension MemcacheCommand where Result == MemcacheResponseValue {
+    public init(keyword: String, arguments: [String], data: ByteBuffer? = nil) {
+        self.init(keyword: keyword, arguments: arguments, data: data) {
+            try $0.map(to: Result.self)
+        }
+    }
+}
+
+extension MemcacheCommand where Result: MemcacheResponseConvertible {
+    public init(keyword: String, arguments: [String], data: ByteBuffer? = nil) {
+        self.init(keyword: keyword, arguments: arguments, data: data) {
+            try $0.map(to: Result.self)
+        }
+    }
+}
+
+extension MemcacheCommand where Result: MemcacheResponseValueConvertible {
+    public init(keyword: String, arguments: [String], data: ByteBuffer? = nil) {
+        self.init(keyword: keyword, arguments: arguments, data: data) {
+            try $0.map(to: Result.self)
+        }
+    }
+}
+
+extension MemcacheCommand where Result == Void {
+    public init(keyword: String, arguments: [String], data: ByteBuffer? = nil) {
+        self.init(keyword: keyword, arguments: arguments, data: data) { _ in }
+    }
+}

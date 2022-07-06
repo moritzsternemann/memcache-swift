@@ -5,7 +5,7 @@
 //  Created by Moritz Sternemann on 04.06.22.
 //
 
-import NIO
+import NIOCore
 
 public struct MemcacheCommandPayload {
     public let keyword: String

@@ -5,7 +5,8 @@
 //  Created by Moritz Sternemann on 04.06.22.
 //
 
-import NIO
+import NIOCore
+import NIOPosix
 
 public final class MemcacheConnection: MemcacheClient {
     public static func make(

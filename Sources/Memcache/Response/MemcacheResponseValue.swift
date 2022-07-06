@@ -5,7 +5,7 @@
 //  Created by Moritz Sternemann on 03.07.22.
 //
 
-import NIO
+import NIOCore
 
 public struct MemcacheResponseValue {
     let key: MemcacheKey

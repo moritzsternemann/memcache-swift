@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import NIO
+import NIOCore
 
 extension MemcacheCommand {
     public static func get(_ keys: [MemcacheKey]) -> MemcacheCommand<[MemcacheResponseValue]> {

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import NIO
+import NIOCore
 
 final class MemcacheByteDecoder: ByteToMessageDecoder {
     typealias InboundOut = MemcacheResponse

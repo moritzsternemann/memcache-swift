@@ -32,6 +32,39 @@ extension String: MemcacheResponseValueConvertible {
     }
 }
 
+// MARK: Integers
+
+extension FixedWidthInteger {
+    public init?(fromResponseValue value: MemcacheResponseValue) {
+        fatalError()
+    }
+}
+
+extension Int: MemcacheResponseValueConvertible {}
+extension Int8: MemcacheResponseValueConvertible {}
+extension Int16: MemcacheResponseValueConvertible {}
+extension Int32: MemcacheResponseValueConvertible {}
+extension Int64: MemcacheResponseValueConvertible {}
+extension UInt: MemcacheResponseValueConvertible {}
+extension UInt8: MemcacheResponseValueConvertible {}
+extension UInt16: MemcacheResponseValueConvertible {}
+extension UInt32: MemcacheResponseValueConvertible {}
+extension UInt64: MemcacheResponseValueConvertible {}
+
+// MARK: Double, Float
+
+extension Double: MemcacheResponseValueConvertible {
+    public init?(fromResponseValue value: MemcacheResponseValue) {
+        fatalError()
+    }
+}
+
+extension Float: MemcacheResponseValueConvertible {
+    public init?(fromResponseValue value: MemcacheResponseValue) {
+        fatalError()
+    }
+}
+
 // MARK: Collections
 
 extension Array: MemcacheResponseConvertible where Element: MemcacheResponseValueConvertible {

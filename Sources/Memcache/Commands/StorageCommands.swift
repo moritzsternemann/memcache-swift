@@ -5,7 +5,7 @@
 //  Created by Moritz Sternemann on 02.07.22.
 //
 
-import NIO
+import NIOCore
 
 extension MemcacheCommand {
     public static func `set`(

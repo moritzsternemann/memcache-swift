@@ -5,7 +5,7 @@
 //  Created by Moritz Sternemann on 29.06.22.
 //
 
-import NIO
+import NIOCore
 
 public enum MemcacheResponse {
     // Storage

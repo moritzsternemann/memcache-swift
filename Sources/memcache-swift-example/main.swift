@@ -1,5 +1,6 @@
 import Memcache
-import NIO
+import NIOCore
+import NIOPosix
 
 let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 defer {

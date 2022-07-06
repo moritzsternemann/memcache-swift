@@ -5,7 +5,7 @@
 //  Created by Moritz Sternemann on 27.06.22.
 //
 
-import NIO
+import NIOCore
 
 final class MemcacheMessageEncoder: MessageToByteEncoder {
     typealias OutboundIn = MemcacheCommandPayload

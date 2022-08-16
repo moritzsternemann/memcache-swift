@@ -8,7 +8,7 @@
 import NIOCore
 import NIOPosix
 
-public final class MemcacheConnection: MemcacheClient {
+public final class MemcacheConnection {
     public static func make(
         address: SocketAddress,
         boundEventLoop eventLoop: EventLoop,

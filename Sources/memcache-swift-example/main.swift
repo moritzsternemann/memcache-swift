@@ -17,11 +17,11 @@ print("connected")
 let buffer = ByteBuffer(staticString: "Hello World")
 let result = try connection
     .set("mykey", to: buffer, expiration: .relative(1337))
-    .flatMap { response -> EventLoopFuture<[String]> in
-        print(response)
-        
-        return connection.get("mykey", "mykey2")
+    .flatMap { response -> EventLoopFuture<String> in
+        print("Set result: \(String(describing: response))")
+
+        return connection.get("mykey")
     }
     .wait()
 
-print("Result: \(String(describing: result))")
+print("Get result: \(String(describing: result))")

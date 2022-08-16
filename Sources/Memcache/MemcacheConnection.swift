@@ -19,7 +19,9 @@ public final class MemcacheConnection: MemcacheClient {
                 ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR),
                 value: 1
             )
-            .channelInitializer { $0.pipeline.addBaseMemcacheHandlers() }
+            .channelInitializer {
+                $0.pipeline.addHandler(MemcacheChannelHandler())
+            }
 
         let future = client
             .connect(to: address)
@@ -42,23 +44,31 @@ public final class MemcacheConnection: MemcacheClient {
 // MARK: Sending
 
 extension MemcacheConnection {
-    public func send<Result>(
-        _ command: MemcacheCommand<Result>,
+    public func send<Flag: MemcacheMetaFlag>(
+        _ command: MemcacheMetaCommand<Flag>,
         eventLoop: EventLoop? = nil
-    ) -> EventLoopFuture<Result> {
+    ) -> EventLoopFuture<MemcacheMetaResponse<Flag>> {
         print("send", command)
         let finalEventLoop = eventLoop ?? channel.eventLoop
 
         // TODO: guard isConnected
 
-        let promise = self.eventLoop.makePromise(of: MemcacheResponse.self)
+        let promise = self.eventLoop.makePromise(of: MemcacheMetaResponse<String>.self)
 
-        let outboundData: MemcacheCommandHandler.OutboundCommandPayload = (command.payload, promise)
+        let outboundData: MemcacheChannelHandler.OutboundCommandPayload = (command.payload, promise)
         let writeFuture = channel.writeAndFlush(outboundData)
 
         return writeFuture
             .flatMap { promise.futureResult }
-            .flatMapThrowing { try command.transform($0) }
+            .flatMapThrowing { try $0.mapFlags() }
             .hop(to: finalEventLoop)
+    }
+
+    public func send<Flag: MemcacheMetaFlag, Result: MemcacheMetaResponseConvertible>(
+        _ command: MemcacheMetaCommand<Flag>,
+        eventLoop: EventLoop? = nil
+    ) -> EventLoopFuture<Result> {
+        send(command, eventLoop: eventLoop)
+            .flatMapThrowing { try $0.map(to: Result.self) }
     }
 }

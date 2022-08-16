@@ -7,60 +7,25 @@
 
 import NIOCore
 
-extension MemcacheCommand {
-    public static func `set`(
+extension MemcacheMetaCommand {
+    public static func metaSet(
         _ key: MemcacheKey,
         value: ByteBuffer,
-        flags: UInt16? = nil,
-        expiration: MemcacheExpiration,
-        noReply: Bool = false
-    ) -> MemcacheCommand<Void> {
-        var arguments: [String] = [key.rawValue]
-        arguments.append(flags.map(String.init) ?? "0")
-        arguments.append(String(expiration.rawValue))
-        arguments.append(String(value.readableBytes))
-        if noReply {
-            arguments.append("noreply")
-        }
-
-        return .init(keyword: "set", arguments: arguments, data: value)
-    }
-
-    public static func add(_ key: MemcacheKey) -> MemcacheCommand {
-        fatalError("not implemented")
-//        .init(keyword: "add", arguments: [])
-    }
-
-    public static func replace(_ key: MemcacheKey) -> MemcacheCommand {
-        fatalError("not implemented")
-//        .init(keyword: "replace", arguments: [])
-    }
-
-    public static func append(_ key: MemcacheKey) -> MemcacheCommand {
-        fatalError("not implemented")
-//        .init(keyword: "append", arguments: [])
-    }
-
-    public static func prepend(_ key: MemcacheKey) -> MemcacheCommand {
-        fatalError("not implemented")
-//        .init(keyword: "prepend", arguments: [])
-    }
-
-    public static func cas(_ key: MemcacheKey) -> MemcacheCommand {
-        fatalError("not implemented")
-//        .init(keyword: "cas", arguments: [])
+        flags: MemcacheMetaSetFlags = []
+    ) -> MemcacheMetaCommand<MemcacheMetaSetFlag> {
+        .init(commandCode: "ms", key: key, flags: flags, data: value)
     }
 }
 
-// MARK: - Client Convenience
+// MARK: - Connection Convenience
 
-extension MemcacheClient {
-    public func `set`(
+extension MemcacheConnection {
+    public func set(
         _ key: MemcacheKey,
         to value: ByteBuffer,
         expiration: MemcacheExpiration,
         eventLoop: EventLoop? = nil
-    ) -> EventLoopFuture<Void> {
-        send(.set(key, value: value, expiration: expiration), eventLoop: eventLoop)
+    ) -> EventLoopFuture<MemcacheMetaResponse<MemcacheMetaSetFlag>> {
+        send(.metaSet(key, value: value, flags: [.ttl("\(expiration.rawValue)")]), eventLoop: eventLoop)
     }
 }

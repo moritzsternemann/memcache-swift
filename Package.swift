@@ -21,7 +21,8 @@ let package = Package(
         .testTarget(
             name: "MemcacheTests",
             dependencies: [
-                .target(name: "Memcache")
+                .target(name: "Memcache"),
+                .product(name: "NIOTestUtils", package: "swift-nio")
             ]
         ),
 

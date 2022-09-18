@@ -5,43 +5,47 @@ extension MemcacheBackendMessage {
         var flags: Flags
         var data: ByteBuffer
 
+        /// Decode a `VA` backend message.
+        ///
+        /// The message can have the following formats:
+        /// - `<size> <flags>\r\n<data block>\r\n`. Flags are space-separated strings.
+        /// - `<size>\r\n<data block>\r\n`
         static func decode(from buffer: inout ByteBuffer) throws -> Self {
-            let bytes = buffer.readableBytesView
-
-            let nextSpaceIndex = bytes.firstIndex(of: .space)
-            let nextNewlineIndex = bytes.firstIndex(of: .newline)
-            let sizeStringEndIndex: Int
-            if let nextSpaceIndex = nextSpaceIndex,
-               let nextNewlineIndex = nextNewlineIndex,
-               nextSpaceIndex < nextNewlineIndex {
-                // Flags after the size string
-                sizeStringEndIndex = nextSpaceIndex - 1
-            } else if let nextNewlineIndex = nextNewlineIndex {
-                // No flags after the size string
-                sizeStringEndIndex = nextNewlineIndex - 1
-            } else {
-                fatalError() // TODO: unexpected message format error
+            // Decode the size of the data block, optional flags, and the data block itself
+            guard let valueMetaSlice = buffer.getCarriageReturnNewlineTerminatedSlice(at: buffer.readerIndex) else {
+                // No \r\n? Something went terribly wrong...
+                preconditionFailure("Expected to only see messages that contain \r\n here.")
             }
 
-            guard let sizeString = buffer.readString(length: sizeStringEndIndex - bytes.startIndex),
-                  let size = Int(sizeString)
-            else {
-                fatalError() // TODO: unexpected message format error
+            // The size value in valueMetaSlice is either the entire slice or the part before the first <space>
+            let endSizeIndex = valueMetaSlice.readableBytesView.firstIndex(of: .space) ?? valueMetaSlice.writerIndex
+
+            guard let sizeString = valueMetaSlice.getString(at: valueMetaSlice.readerIndex, length: endSizeIndex) else {
+                preconditionFailure("We have readable bytes so we should be able to read a string")
             }
 
-            let flags: Flags
-            if let nextSpaceIndex = nextSpaceIndex,
-               let nextNewlineIndex = nextNewlineIndex,
-               nextSpaceIndex < nextNewlineIndex {
-                buffer.moveReaderIndex(forwardBy: 1) // <space>
-                flags = try .decode(from: &buffer)
-            } else {
-                flags = Flags()
+            guard let size = Int(sizeString) else {
+                throw MemcachePartialDecodingError.fieldNotDecodable(as: Int.self, from: sizeString)
             }
 
-            buffer.moveReaderIndex(forwardBy: 2) // \r\n
+            // Move the buffer's readerIndex to after the size so we can continue reading flags and/or data.
+            buffer.moveReaderIndex(forwardBy: endSizeIndex)
+
+            if buffer.readableBytesView.first == .space {
+                // Move the reader index to after the <space> that is following the size
+                buffer.moveReaderIndex(forwardBy: 1)
+            }
+
+            let flags = try Flags.decode(from: &buffer)
+
             guard let dataBlock = buffer.readSlice(length: size) else {
-                fatalError() // TODO: Not enough data error
+                // Tell the decoder that we expect more data
+                throw MemcacheNeedMoreDataError()
+            }
+
+            // Make sure we received the final terminating \r\n.
+            guard let _ = buffer.readCarriageReturnNewlineTerminatedSlice() else {
+                throw MemcacheNeedMoreDataError()
             }
 
             return Value(flags: flags, data: dataBlock)

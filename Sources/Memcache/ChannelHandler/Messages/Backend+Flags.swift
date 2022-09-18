@@ -2,7 +2,7 @@ import NIOCore
 
 extension MemcacheBackendMessage {
     struct Flags: MemcacheMessagePayloadDecodable, Equatable, ExpressibleByArrayLiteral {
-        let flags: [String]
+        let flags: [String] // TODO: Do we want something like (Character, token: String?) instead? Or a struct?
 
         init(_ flags: [String]) {
             self.flags = flags
@@ -12,19 +12,26 @@ extension MemcacheBackendMessage {
             flags = elements
         }
 
+        /// Decode flags from any backend message.
+        ///
+        /// The following formats can be decoded from the `buffer`:
+        /// - `<flags>\r\n`. Flags are space-separated strings.
+        /// - `\r\n`. No flags.
         static func decode(from buffer: inout ByteBuffer) throws -> Self {
-            guard buffer.readableBytes > 2 else { return [] }
-
-            let bytes = buffer.readableBytesView
-            guard let newlineIndex = bytes.firstIndex(of: .newline),
-                  bytes[newlineIndex - 1] == .carriageReturn,
-                  let flagsString = buffer.getString(at: buffer.readerIndex, length: newlineIndex - 2 - buffer.readerIndex)
-            else {
-                fatalError() // TODO:  invalid string error
+            // Flags are always the last part of a message, which is terminated by \r\n.
+            // Because we get passed a potentially longer buffer here, we parse until \r\n.
+            guard var flagsSlice = buffer.readCarriageReturnNewlineTerminatedSlice() else {
+                // No \r\n? Something went terribly wrong...
+                preconditionFailure("Expected to only see messages that contain \r\n here.")
             }
 
-            // we read the flags but not the tailing \r\n
-            buffer.moveReaderIndex(to: newlineIndex - 1)
+            // Flags can always be empty
+            guard flagsSlice.readableBytes > 0 else { return [] }
+
+            // The slice now only contains the flags separated by <space>
+            guard let flagsString = flagsSlice.readString(length: flagsSlice.readableBytes) else {
+                preconditionFailure("We have readable bytes so we should be able to read a string")
+            }
 
             return Flags(flagsString.components(separatedBy: " "))
         }

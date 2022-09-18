@@ -90,6 +90,7 @@ extension MemcacheBackendMessage {
         case .value:
             return try .value(.decode(from: &buffer))
         case .end:
+            buffer.moveReaderIndex(forwardBy: 2)
             return .end
         }
     }

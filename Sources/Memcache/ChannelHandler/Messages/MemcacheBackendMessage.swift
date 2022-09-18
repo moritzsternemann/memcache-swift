@@ -5,12 +5,24 @@ protocol MemcacheMessagePayloadDecodable {
 }
 
 enum MemcacheBackendMessage {
+    /// Header (`HD <flags>*\r\n`)
     case header(Flags)
+
+    /// Not found (`NF <flags>*\r\n`)
     case notFound(Flags)
+
+    /// Not stored (`NS <flags>*\r\n`)
     case notStored(Flags)
+
+    /// Exists (`EX <flags>*\r\n`)
     case exists(Flags)
+
+    /// Value (`VA <size> <flags>*\r\n<data block>\r\n`)
     case value(Value)
+
+    /// End (`EN\r\n`)
     case end
+
     // TODO: error responses
 }
 

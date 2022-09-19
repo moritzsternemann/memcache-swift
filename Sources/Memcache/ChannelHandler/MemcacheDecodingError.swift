@@ -4,7 +4,7 @@ struct MemcacheDecodingError: Error {
     let messageVerb: String
     let payload: String
     let description: String
-    let file: StaticString
+    let file: String
     let line: UInt
 
     static func withPartialError(
@@ -23,7 +23,7 @@ struct MemcacheDecodingError: Error {
 
     static func emptyMessageReceived(
         bytes: ByteBuffer,
-        file: StaticString = #file,
+        file: String = #fileID,
         line: UInt = #line
     ) -> Self {
         MemcacheDecodingError(
@@ -38,7 +38,7 @@ struct MemcacheDecodingError: Error {
     static func unknownVerbReceived(
         messageVerb: String,
         messageBytes: ByteBuffer,
-        file: StaticString = #file,
+        file: String = #fileID,
         line: UInt = #line
     ) -> Self {
         MemcacheDecodingError(

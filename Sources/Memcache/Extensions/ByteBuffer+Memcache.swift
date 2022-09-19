@@ -1,7 +1,6 @@
 import NIOCore
 
 extension ByteBuffer {
-    @inlinable
     func _getCarriageReturnNewlineTerminatedSliceLength(at index: Int) -> Int? {
         guard readerIndex <= index && index < writerIndex - 1 else {
             return nil
@@ -30,7 +29,6 @@ extension ByteBuffer {
     ///
     /// - Returns: A `ByteBuffer` slice of this `ByteBuffer` or `nil` if there isn't a complete `\r\n`-terminated slice, including
     ///            terminators, in the readable bytes of the buffer. The returned slice does not include the terminators.
-    @inlinable
     mutating func readCarriageReturnNewlineTerminatedSlice() -> ByteBuffer? {
         guard let sliceLength = _getCarriageReturnNewlineTerminatedSliceLength(at: readerIndex) else {
             return nil
@@ -47,7 +45,6 @@ extension ByteBuffer {
     ///     - index: The starting index into `ByteBuffer` containing the `\r\n`-terminated slice of interest.
     /// - Returns: A `ByteBuffer` slice of this `ByteBuffer` or `nil` if there isn't a complete `\r\n`-terminated slice, including
     ///            terminators, in the readable bytes after `index` in the buffer. The returned slice does not include the terminators.
-    @inlinable
     func getCarriageReturnNewlineTerminatedSlice(at index: Int) -> ByteBuffer? {
         guard let sliceLength = _getCarriageReturnNewlineTerminatedSliceLength(at: index) else {
             return nil

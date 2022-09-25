@@ -18,6 +18,19 @@ struct MemcachePartialDecodingError: Error {
         )
     }
 
+    static func expectedAtLeastNRemainingCharacters(
+        _ expected: Int,
+        actual: Int,
+        file: String = #fileID,
+        line: UInt = #line
+    ) -> Self {
+        MemcachePartialDecodingError(
+            description: "Expected at  least '\(expected)' but found '\(actual)' remaining characters",
+            file: file,
+            line: line
+        )
+    }
+
     static func expectedAtMostNRemainingCharacters(
         _ expected: Int,
         actual: Int,

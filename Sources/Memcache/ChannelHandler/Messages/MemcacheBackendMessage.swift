@@ -23,7 +23,14 @@ enum MemcacheBackendMessage {
     /// End (`EN\r\n`)
     case end
 
-    // TODO: error responses
+    /// Nonexistent command name (`ERROR\r\n`)
+    case nonExistentCommandError
+
+    /// Client error (`CLIENT_ERROR <error>\r\n`)
+    case clientError(ErrorMessage)
+
+    /// Server error (`SERVER_ERROR <error>\r\n`)
+    case serverError(ErrorMessage)
 }
 
 extension MemcacheBackendMessage {
@@ -36,7 +43,10 @@ extension MemcacheBackendMessage {
         case exists
         case value
         case end
-        // TODO: error responses
+
+        case nonExistentCommandError
+        case clientError
+        case serverError
 
         init?(rawValue: String) {
             switch rawValue {
@@ -52,6 +62,12 @@ extension MemcacheBackendMessage {
                 self = .value
             case "EN":
                 self = .end
+            case "ERROR":
+                self = .nonExistentCommandError
+            case "CLIENT_ERROR":
+                self = .clientError
+            case "SERVER_ERROR":
+                self = .serverError
             default:
                 return nil
             }
@@ -71,6 +87,12 @@ extension MemcacheBackendMessage {
                 return "VA"
             case .end:
                 return "EN"
+            case .nonExistentCommandError:
+                return "ERROR"
+            case .clientError:
+                return "CLIENT_ERROR"
+            case .serverError:
+                return "SERVER_ERROR"
             }
         }
     }
@@ -92,6 +114,13 @@ extension MemcacheBackendMessage {
         case .end:
             buffer.moveReaderIndex(forwardBy: 2)
             return .end
+        case .nonExistentCommandError:
+            buffer.moveReaderIndex(forwardBy: 2)
+            return .nonExistentCommandError
+        case .clientError:
+            return try .clientError(.decode(from: &buffer))
+        case .serverError:
+            return try .serverError(.decode(from: &buffer))
         }
     }
 }
@@ -111,6 +140,12 @@ extension MemcacheBackendMessage: CustomDebugStringConvertible {
             return ".value(\(String(reflecting: value)))"
         case .end:
             return ".end"
+        case .nonExistentCommandError:
+            return ".nonExistentCommandError"
+        case let .clientError(string):
+            fatalError(string)
+        case let .serverError(string):
+            fatalError(string)
         }
     }
 }

@@ -9,13 +9,15 @@ let package = Package(
         .executable(name: "memcache-swift-example", targets: ["memcache-swift-example"])
     ],
     dependencies: [
-         .package(url: "https://github.com/apple/swift-nio.git", from: "2.40.0")
+         .package(url: "https://github.com/apple/swift-nio.git", from: "2.40.0"),
+         .package(url: "https://github.com/swift-extras/swift-extras-base64.git", from: "0.7.0")
     ],
     targets: [
         .target(
             name: "Memcache",
             dependencies: [
-                .product(name: "NIO", package: "swift-nio")
+                .product(name: "NIO", package: "swift-nio"),
+                .product(name: "ExtrasBase64", package: "swift-extras-base64")
             ]
         ),
         .testTarget(

@@ -1,3 +1,4 @@
+import ExtrasBase64
 import NIOCore
 
 struct MemcacheDecodingError: Error {
@@ -14,7 +15,7 @@ struct MemcacheDecodingError: Error {
     ) -> Self {
         MemcacheDecodingError(
             messageVerb: messageVerb,
-            payload: "", // TODO: Can we get a base64 representation without Foundation?
+            payload: String(base64Encoding: messageBytes.readableBytesView),
             description: partialError.description,
             file: partialError.file,
             line: partialError.line
@@ -28,7 +29,7 @@ struct MemcacheDecodingError: Error {
     ) -> Self {
         MemcacheDecodingError(
             messageVerb: "",
-            payload: "", // TODO: Can we get a base64 representation without Foundation?
+            payload: String(base64Encoding: bytes.readableBytesView),
             description: "Received an empty message (i.e. no characters before the first occurence of \r\n). A valid message has to contain a messageVerb at least.",
             file: file,
             line: line
@@ -43,7 +44,7 @@ struct MemcacheDecodingError: Error {
     ) -> Self {
         MemcacheDecodingError(
             messageVerb: messageVerb,
-            payload: "", // TODO: Can we get a base64 representation without Foundation?
+            payload: String(base64Encoding: messageBytes.readableBytesView),
             description: "Received a message with messageVerb '\(messageVerb)'. There is no message type associated with this message identifier.",
             file: file,
             line: line

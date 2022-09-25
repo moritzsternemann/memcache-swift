@@ -7,7 +7,7 @@ import XCTest
 final class MemcacheBackendMessageDecoderTests: XCTestCase {
     func testDecodeMessageWithAndWithoutFlags() {
         // TODO: Test decoding these messages also without flags. Test EN\r\n should fail when we receive it with flags.
-        let flags: MemcacheBackendMessage.Flags = ["B1", "a", "r"]
+        let flags: MemcacheBackendMessage.Flags = [.b, .R(0), .f]
         let expected: [MemcacheBackendMessage] = [
             .header(flags),
             .notFound(flags),
@@ -16,8 +16,9 @@ final class MemcacheBackendMessageDecoderTests: XCTestCase {
             .end
         ]
 
+        let flagsString = "b R0 f"
         let messageString = [MemcacheBackendMessage.Verb]([.header, .notFound, .notStored, .exists])
-            .map { "\($0.rawValue) \(flags.flags.joined(separator: " "))\r\n" }
+            .map { "\($0.rawValue) \(flagsString)\r\n" }
             .joined()
             + "EN\r\n"
 
@@ -31,11 +32,11 @@ final class MemcacheBackendMessageDecoderTests: XCTestCase {
         var buffer = ByteBuffer()
         buffer.writeString("foo")
         let expected: [MemcacheBackendMessage] = [
-            .value(.init(flags: ["b", "a", "r"], data: buffer))
+            .value(.init(flags: [.b, .R(0), .f], data: buffer))
         ]
 
         XCTAssertNoThrow(try ByteToMessageDecoderVerifier.verifyDecoder(
-            stringInputOutputPairs: [("VA 3 b a r\r\nfoo\r\n", expected)],
+            stringInputOutputPairs: [("VA 3 b R0 f\r\nfoo\r\n", expected)],
             decoderFactory: { MemcacheBackendMessageDecoder() }
         ))
     }

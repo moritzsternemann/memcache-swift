@@ -1,7 +1,8 @@
+import ExtrasBase64
 import NIOCore
 
 extension MemcacheBackendMessage {
-    struct Value: MemcacheMessagePayloadDecodable, Equatable {
+    struct Value: MemcacheMessagePayloadDecodable {
         var flags: Flags
         var data: ByteBuffer
 
@@ -55,6 +56,6 @@ extension MemcacheBackendMessage {
 
 extension MemcacheBackendMessage.Value: CustomDebugStringConvertible {
     var debugDescription: String {
-        return "flags: \(flags), data: \(data.readableBytes) bytes"
+        return "\(flags), data: \(String(base64Encoding: data.readableBytesView))"
     }
 }

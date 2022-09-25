@@ -5,14 +5,27 @@ struct MemcachePartialDecodingError: Error {
     let file: String
     let line: UInt
 
-    static func expectedExactlyNRemainingBytes(
+    static func expectedExactlyNRemainingCharacters(
         _ expected: Int,
         actual: Int,
         file: String = #fileID,
         line: UInt = #line
     ) -> Self {
         MemcachePartialDecodingError(
-            description: "Expected exactly '\(expected)' but found '\(actual)' remaining bytes",
+            description: "Expected exactly '\(expected)' but found '\(actual)' remaining characters",
+            file: file,
+            line: line
+        )
+    }
+
+    static func expectedAtMostNRemainingCharacters(
+        _ expected: Int,
+        actual: Int,
+        file: String = #fileID,
+        line: UInt = #line
+    ) -> Self {
+        MemcachePartialDecodingError(
+            description: "Expected at  most '\(expected)' but found '\(actual)' remaining characters",
             file: file,
             line: line
         )
@@ -25,7 +38,7 @@ struct MemcachePartialDecodingError: Error {
         line: UInt = #line
     ) -> Self {
         MemcachePartialDecodingError(
-            description: "Could not read '\(type)' from '\(string)' from the ByteBuffer.",
+            description: "Could not decode '\(type)' from '\(string)'",
             file: file,
             line: line
         )

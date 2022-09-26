@@ -1,8 +1,12 @@
 import NIOCore
 
 extension MemcacheBackendMessage {
-    struct ErrorMessage: MemcacheMessagePayloadDecodable {
+    struct ErrorMessage: MemcacheMessagePayloadDecodable, ExpressibleByStringLiteral {
         let message: String
+
+        init(stringLiteral value: String) {
+            self.message = value
+        }
 
         static func decode(from buffer: inout ByteBuffer) throws -> Self {
             // An error message is always the last part of a text line, which is terminated by \r\n.
@@ -16,7 +20,13 @@ extension MemcacheBackendMessage {
 
             let messageString = messageSlice.readString(length: messageSlice.readableBytes)!
 
-            return ErrorMessage(message: messageString)
+            return ErrorMessage(stringLiteral: messageString)
         }
+    }
+}
+
+extension MemcacheBackendMessage.ErrorMessage: CustomDebugStringConvertible {
+    var debugDescription: String {
+        "message: \"\(message)\""
     }
 }

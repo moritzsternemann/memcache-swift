@@ -15,6 +15,12 @@ extension MemcacheBackendMessage: Equatable {
             return lhs == rhs
         case (.end, .end):
             return true
+        case (.nonExistentCommandError, .nonExistentCommandError):
+            return true
+        case let (.clientError(lhs), .clientError(rhs)):
+            return lhs == rhs
+        case let (.serverError(lhs), .serverError(rhs)):
+            return lhs == rhs
         default:
             return false
         }
@@ -77,5 +83,11 @@ extension MemcacheFlag.OpaqueToken: Equatable {
 extension MemcacheFlag.TTLToken: Equatable {
     public static func ==(lhs: Self, rhs: Self) -> Bool {
         lhs.value == rhs.value
+    }
+}
+
+extension MemcacheBackendMessage.ErrorMessage: Equatable {
+    public static func ==(lhs: Self, rhs: Self) -> Bool {
+        lhs.message == rhs.message
     }
 }

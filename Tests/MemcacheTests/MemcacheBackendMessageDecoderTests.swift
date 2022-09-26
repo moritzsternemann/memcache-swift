@@ -13,7 +13,10 @@ final class MemcacheBackendMessageDecoderTests: XCTestCase {
             .notFound(flags),
             .notStored(flags),
             .exists(flags),
-            .end
+            .end,
+            .nonExistentCommandError,
+            .clientError("Test Error"),
+            .serverError("Test Error")
         ]
 
         let flagsString = "b R0 f"
@@ -21,6 +24,7 @@ final class MemcacheBackendMessageDecoderTests: XCTestCase {
             .map { "\($0.rawValue) \(flagsString)\r\n" }
             .joined()
             + "EN\r\n"
+            + "ERROR\r\nCLIENT_ERROR Test Error\r\nSERVER_ERROR Test Error\r\n"
 
         XCTAssertNoThrow(try ByteToMessageDecoderVerifier.verifyDecoder(
             stringInputOutputPairs: [(messageString, expected)],

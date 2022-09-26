@@ -12,6 +12,9 @@ final class MemcacheBackendMessageTests: XCTestCase {
         XCTAssertEqual(MemcacheBackendMessage.Verb(rawValue: "EX"), .exists)
         XCTAssertEqual(MemcacheBackendMessage.Verb(rawValue: "VA"), .value)
         XCTAssertEqual(MemcacheBackendMessage.Verb(rawValue: "EN"), .end)
+        XCTAssertEqual(MemcacheBackendMessage.Verb(rawValue: "ERROR"), .nonExistentCommandError)
+        XCTAssertEqual(MemcacheBackendMessage.Verb(rawValue: "CLIENT_ERROR"), .clientError)
+        XCTAssertEqual(MemcacheBackendMessage.Verb(rawValue: "SERVER_ERROR"), .serverError)
 
         XCTAssertNil(MemcacheBackendMessage.Verb(rawValue: ""))
     }
@@ -23,6 +26,9 @@ final class MemcacheBackendMessageTests: XCTestCase {
         XCTAssertEqual(MemcacheBackendMessage.Verb.exists.rawValue, "EX")
         XCTAssertEqual(MemcacheBackendMessage.Verb.value.rawValue, "VA")
         XCTAssertEqual(MemcacheBackendMessage.Verb.end.rawValue, "EN")
+        XCTAssertEqual(MemcacheBackendMessage.Verb.nonExistentCommandError.rawValue, "ERROR")
+        XCTAssertEqual(MemcacheBackendMessage.Verb.clientError.rawValue, "CLIENT_ERROR")
+        XCTAssertEqual(MemcacheBackendMessage.Verb.serverError.rawValue, "SERVER_ERROR")
     }
 
     func testDebugDescription() {
@@ -32,5 +38,8 @@ final class MemcacheBackendMessageTests: XCTestCase {
         XCTAssertEqual("\(MemcacheBackendMessage.exists([.T(1), .v]))", ".exists(flags: [.T(ttl: 1), .v])")
         XCTAssertEqual("\(MemcacheBackendMessage.value(.init(flags: [.T(1), .v], data: ByteBuffer())))", ".value(flags: [.T(ttl: 1), .v], data: )")
         XCTAssertEqual("\(MemcacheBackendMessage.end)", ".end")
+        XCTAssertEqual("\(MemcacheBackendMessage.nonExistentCommandError)", ".nonExistentCommandError")
+        XCTAssertEqual("\(MemcacheBackendMessage.clientError("Test Error"))", ".clientError(message: \"Test Error\")")
+        XCTAssertEqual("\(MemcacheBackendMessage.serverError("Test Error"))", ".serverError(message: \"Test Error\")")
     }
 }

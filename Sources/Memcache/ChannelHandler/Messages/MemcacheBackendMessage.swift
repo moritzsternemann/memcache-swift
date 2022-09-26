@@ -142,10 +142,10 @@ extension MemcacheBackendMessage: CustomDebugStringConvertible {
             return ".end"
         case .nonExistentCommandError:
             return ".nonExistentCommandError"
-        case let .clientError(string):
-            fatalError(string)
-        case let .serverError(string):
-            fatalError(string)
+        case let .clientError(message):
+            return ".clientError(\(String(reflecting: message)))"
+        case let .serverError(message):
+            return ".serverError(\(String(reflecting: message)))"
         }
     }
 }

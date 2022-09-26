@@ -20,10 +20,7 @@ extension MemcacheBackendMessage {
 
             // The size value in valueMetaSlice is either the entire slice or the part before the first <space>
             let endSizeIndex = valueMetaSlice.readableBytesView.firstIndex(of: .space) ?? valueMetaSlice.writerIndex
-
-            guard let sizeString = valueMetaSlice.getString(at: valueMetaSlice.readerIndex, length: endSizeIndex) else {
-                preconditionFailure("We have readable bytes so we should be able to read a string")
-            }
+            let sizeString = valueMetaSlice.getString(at: valueMetaSlice.readerIndex, length: endSizeIndex)!
 
             guard let size = Int(sizeString) else {
                 throw MemcachePartialDecodingError.fieldNotDecodable(as: Int.self, from: sizeString)
